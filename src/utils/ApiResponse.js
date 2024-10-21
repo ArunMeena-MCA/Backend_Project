@@ -6,3 +6,5 @@ class ApiResponse{
         this.success = statusCode < 400  // SEE : Mdn/HTTP response status codes
     }
 }
+
+export { ApiResponse }
