@@ -57,7 +57,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
     // check for images, check for avatar
     
-    const avatarLocalPath = req.files?.avatar[0]?.path;
+    const avatarLocalPath = req.files?.avatar?.[0]?.path;
 
 
     //const coverImageLocalPath = req.files?.coverImage[0]?.path;
@@ -159,8 +159,8 @@ const loginUser = asyncHandler(async(req,res) => {
     const loggedInUser = await user.findById(newUser._id).select("-password -refreshToken")
     
     const options = {
-        httpOnly: true,
-        secure: true
+        // httpOnly: true,
+        // secure: true
     }
 
     return res.status(200)
@@ -191,8 +191,8 @@ const logoutUser = asyncHandler(async (req,res) => {
     )
 
     const options = {
-        httpOnly: true,
-        secure: true
+        // httpOnly: true,
+        // secure: true
     }
 
     return res.status(200)
