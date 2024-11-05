@@ -109,7 +109,6 @@ const registerUser = asyncHandler(async (req, res) => {
     }
 
 
-
     // return response
 
     return res.status(201).json(
@@ -248,9 +247,97 @@ const refreshAccessToken = asyncHandler( async (req,res) => {
     }
 })
 
+const changeCurrentPassword = asyncHandler(async(req,res) => {
+    const {currentPassword,newPassword} = req.body;
+
+    if(!(currentPassword || newPassword)){
+        throw new ApiError(400,"currentPassword or newPassword is required")
+    }
+
+    const currentUserId = req.User?._id;
+    const currentUser = await user.findById(currentUserId);
+    const isPasswordvalid = await currentUser.isPasswordCorrect(currentPassword)
+
+    if(!isPasswordvalid){
+        throw new ApiError(401,"Invalid Password")
+    }
+
+    currentUser.password = newPassword;
+    await currentUser.save({ validateBeforeSave : false });
+
+    return res.status(200)
+    .json(
+        new ApiResponse(
+            200,
+            {},
+            "Password changed successfully"
+        )
+    )
+})
+
+const getCurrentUser = asyncHandler(async(req,res) => {
+    return res.status(200)
+    .json(
+        200,
+        req.User,
+        "User fetched successfully"
+    )
+})
+
+const updateAccountDetails = asyncHandler(async(req,res) => {
+    const {fullname,email} = req.body;
+
+    const currentUserId = req.User?._id;
+    const currentUser = await user.findById(currentUserId).select(
+        "-password -refreshToken"
+    )
+
+
+    if(!(fullname || email)){
+        throw new ApiError(400,"At least one field is required to update!");
+    }
+
+    if(fullname){
+        currentUser.fullname = fullname;
+    }
+    if(email){
+        currentUser.email = email;
+    }
+
+    let avatarLocalPath, coverImageLocalPath;
+    
+    if(req.files && Array.isArray(req.files.avatar) && req.files.coverImage.avatar > 0){
+        avatarLocalPath = req.files.avatar[0].path;
+    }
+
+    if(avatarLocalPath){
+        const avatarlink = await uploadOnCloudinary(avatarLocalPath);
+        currentUserId.avatar = avatarlink;
+    }
+    
+    if(req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0){
+        coverImageLocalPath = req.files.coverImage[0].path;
+    }
+    
+    if(coverImageLocalPath){
+        const coverImagelink = await uploadOnCloudinary(avatarLocalPath);
+        currentUserId.coverImage = coverImagelink;
+    }
+
+    await currentUser.save({validateBeforeSave: false});
+
+    return res.status(200)
+    .json(
+        new ApiResponse(200, currentUser, "Details updated successfully!")
+    )
+})
+
 export { 
     registerUser,
     loginUser,
     logoutUser,
-    refreshAccessToken
+    refreshAccessToken,
+    changeCurrentPassword,
+    getCurrentUser,
+    updateAccountDetails
 }                      
