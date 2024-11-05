@@ -37,10 +37,10 @@ router.route("/login").post(loginUser)
 router.route("/logout").post(verifyJWT, logoutUser)
 router.route("/refresh-token").post(refreshAccessToken)
 router.route("/changePassword").post(verifyJWT,changeCurrentPassword)
-router.route("/getCurrentUser").post(verifyJWT,getCurrentUser)
+router.route("/getCurrentUser").get(verifyJWT,getCurrentUser)  // get request
 router.route("/updateAccountDetails").post(verifyJWT,updateAccountDetails)
 
-router.route("/updateUserAvatar").post(verifyJWT,upload.single("avatar"),updateUserAvatar)
-router.route("/updateUserCoverImage").post(verifyJWT,upload.single("coverImage"),updateUserCoverImage)
+router.route("/updateUserAvatar").patch(verifyJWT,upload.single("avatar"),updateUserAvatar)
+router.route("/updateUserCoverImage").patch(verifyJWT,upload.single("coverImage"),updateUserCoverImage)
 
 export default router  
