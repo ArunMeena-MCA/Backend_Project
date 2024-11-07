@@ -418,7 +418,7 @@ const updateUserCoverImage = asyncHandler(async(req,res) => {
 })
 
 const getUserChannel = asyncHandler(async (req,res) => {
-    const username = req.params
+    const { username } = req.params;
 
     if(!username?.trim()){
         throw new ApiError(400,"username is missing")
@@ -454,7 +454,7 @@ const getUserChannel = asyncHandler(async (req,res) => {
                 },
                 isSubscribed: {
                     $cond: {
-                        if: { $in: [req.User?._id,$subscribers.subscriber]},
+                        if: { $in: [req.User?._id,"$subscribers.subscriber"]},
                         then: true,
                         else: false
                     }
@@ -501,7 +501,7 @@ const getUserWatchHistory = asyncHandler(async (req,res) => {
                 pipeline: [
                     {
                         $lookup: {
-                            from: user,
+                            from: "user",
                             localField: "owner",
                             foreignField: "_id",
                             as: "owner",
