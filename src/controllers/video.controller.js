@@ -242,6 +242,22 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
     )
 })
 
+const incrementViews = asyncHandler(async (req, res) => {
+    const { videoId } = req.params
+
+    const video = await Video.findById(videoId);
+
+    if(!video){
+        throw new ApiError(400,"video not found to increment views")
+    }
+
+    video.views += 1;
+    await video.save({validateBeforeSave: false})
+
+    return res.status(200)
+    .json( new ApiResponse(200,video,"Views incremented" ))
+})
+
 
 export{
     getAllVideos,
@@ -249,6 +265,7 @@ export{
     publishVideo,
     updateVideo,
     deleteVideo,
-    togglePublishStatus
+    togglePublishStatus,
+    incrementViews
 }
 
